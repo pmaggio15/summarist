@@ -53,6 +53,10 @@ export default function ForYou() {
       .catch(error => console.error('Error:', error));
   }, []);
 
+  const handleBookClick = (bookId: string) => {
+    router.push(`/book/${bookId}`);
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
@@ -265,14 +269,17 @@ export default function ForYou() {
             </h2>
             
             {selectedBook ? (
-              <div style={{
+              <div 
+                onClick={() => handleBookClick(selectedBook.id)}
+                style={{
                 backgroundColor: '#fef8e7',
                 padding: '32px',
                 borderRadius: '8px',
                 display: 'flex',
                 gap: '16px',
                 alignItems: 'flex-start',
-                maxWidth: '700px'
+                maxWidth: '700px',
+                cursor: 'pointer'
               }}>
                 <div style={{ flex: 1, maxWidth: '225px' }}>
                   <h3 style={{
@@ -357,7 +364,23 @@ export default function ForYou() {
               gap: '24px'
             }}>
               {recommendedBooks.slice(0, 5).map((book) => (
-                <div key={book.id} style={{ cursor: 'pointer' }}>
+                <div 
+                  key={book.id} 
+                  onClick={() => handleBookClick(book.id)}
+                  style={{ 
+                    cursor: 'pointer',
+                    padding: '16px',
+                    margin: '-16px',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#d4e6dc6f';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   <div style={{
                     width: '100%',
                     height: '200px',
@@ -371,7 +394,7 @@ export default function ForYou() {
                         width: '100%', 
                         height: '100%', 
                         objectFit: 'cover', 
-                        borderRadius: '4px' 
+                        borderRadius: '4px'
                       }}
                     />
                     {book.subscriptionRequired && (
@@ -438,7 +461,23 @@ export default function ForYou() {
               gap: '24px'
             }}>
               {suggestedBooks.slice(0, 5).map((book) => (
-                <div key={book.id} style={{ cursor: 'pointer' }}>
+                <div 
+                  key={book.id} 
+                  onClick={() => handleBookClick(book.id)}
+                  style={{ 
+                    cursor: 'pointer',
+                    padding: '16px',
+                    margin: '-16px',
+                    borderRadius: '8px',
+                    transition: 'background-color 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#d4e6dc6f';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   <div style={{
                     width: '100%',
                     height: '200px',
@@ -452,7 +491,7 @@ export default function ForYou() {
                         width: '100%', 
                         height: '100%', 
                         objectFit: 'cover', 
-                        borderRadius: '4px' 
+                        borderRadius: '4px'
                       }}
                     />
                     {book.subscriptionRequired && (
