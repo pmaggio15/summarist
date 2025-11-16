@@ -255,21 +255,7 @@ export default function BookDetail() {
         {/* Book Content */}
         <div style={{ padding: '40px', maxWidth: '1100px' }}>
           {/* Book Header */}
-          <div style={{ display: 'flex', gap: '32px', marginBottom: '40px' }}>
-            {/* Book Cover */}
-            <div style={{ width: '200px', flexShrink: 0 }}>
-              <img 
-                src={book.imageLink} 
-                alt={book.title}
-                style={{ 
-                  width: '100%', 
-                  height: 'auto',
-                  borderRadius: '4px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-            </div>
-
+          <div style={{ display: 'flex', gap: '40px', marginBottom: '40px' }}>
             {/* Book Info */}
             <div style={{ flex: 1 }}>
               <h1 style={{
@@ -296,17 +282,23 @@ export default function BookDetail() {
               }}>
                 {book.subTitle}
               </p>
+              <hr style={{
+                border: 'none',
+                borderTop: '1px solid #e1e7ea',
+                margin: '24px 0'
+              }} />
 
               {/* Book Stats */}
               <div style={{ 
-                display: 'flex', 
-                gap: '24px', 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '16px', 
                 marginBottom: '24px',
-                flexWrap: 'wrap'
+                maxWidth: '500px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 0 0 .6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0 0 46.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3z"></path>
+                    <path d="M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 0 0 .6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0 0 46.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3zM664.8 561.6l36.1 210.3L512 672.7 323.1 772l36.1-210.3-152.8-149L417.6 382 512 190.7 606.4 382l211.2 30.7-152.8 148.9z"></path>
                   </svg>
                   <span style={{ fontSize: '14px', color: '#032b41' }}>
                     {book.averageRating} ({book.totalRating} ratings)
@@ -322,24 +314,35 @@ export default function BookDetail() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
-                    <path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"></path>
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M842 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 140.3-113.7 254-254 254S258 594.3 258 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 168.7 126.6 307.9 290 327.6V884H326.7c-13.7 0-24.7 14.3-24.7 32v36c0 4.4 2.8 8 6.2 8h407.6c3.4 0 6.2-3.6 6.2-8v-36c0-17.7-11-32-24.7-32H548V782.1c165.3-18 294-158 294-328.1zM512 624c93.9 0 170-75.2 170-168V232c0-92.8-76.1-168-170-168s-170 75.2-170 168v224c0 92.8 76.1 168 170 168zm-94-392c0-50.6 41.9-92 94-92s94 41.4 94 92v224c0 50.6-41.9 92-94 92s-94-41.4-94-92V232z"></path>
                   </svg>
                   <span style={{ fontSize: '14px', color: '#032b41' }}>Audio & Text</span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"></path>
+                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                   </svg>
                   <span style={{ fontSize: '14px', color: '#032b41' }}>{book.keyIdeas} Key ideas</span>
                 </div>
               </div>
+              <hr style={{
+                border: 'none',
+                borderTop: '1px solid #e1e7ea',
+                margin: '24px 0'
+              }} />
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                <button style={{
+                <button 
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1e4976';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#032b41';
+                  }}
+                  style={{
                   padding: '12px 24px',
                   backgroundColor: '#032b41',
                   color: 'white',
@@ -350,7 +353,8 @@ export default function BookDetail() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  transition: 'background-color 0.2s ease'
                 }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
@@ -359,7 +363,14 @@ export default function BookDetail() {
                   Read
                 </button>
 
-                <button style={{
+                <button 
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1e4976';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#032b41';
+                  }}
+                  style={{
                   padding: '12px 24px',
                   backgroundColor: '#032b41',
                   color: 'white',
@@ -370,7 +381,8 @@ export default function BookDetail() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  transition: 'background-color 0.2s ease'
                 }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
@@ -381,17 +393,25 @@ export default function BookDetail() {
                 </button>
               </div>
 
-              <button style={{
+              <button 
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#024bb5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#0365f2';
+                }}
+                style={{
                 padding: '0',
                 backgroundColor: 'transparent',
-                color: '#20ba68',
+                color: '#0365f2',
                 border: 'none',
                 fontSize: '16px',
                 fontWeight: '500',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+                transition: 'color 0.2s ease'
               }}>
                 <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
                   <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
@@ -399,43 +419,22 @@ export default function BookDetail() {
                 Add title to My Library
               </button>
             </div>
-          </div>
 
-          {/* Tabs */}
-          <div style={{ borderBottom: '1px solid #e1e7ea', marginBottom: '24px' }}>
-            <div style={{ display: 'inline-flex', gap: '32px' }}>
-              <button
-                onClick={() => setActiveTab('summary')}
-                style={{
-                  padding: '12px 0',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  borderBottom: activeTab === 'summary' ? '3px solid #2bd97c' : '3px solid transparent',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color: activeTab === 'summary' ? '#032b41' : '#6b757b',
-                  cursor: 'pointer'
+            {/* Book Cover - Moved to Right */}
+            <div style={{ width: '250px', flexShrink: 0 }}>
+              <img 
+                src={book.imageLink} 
+                alt={book.title}
+                style={{ 
+                  width: '100%', 
+                  height: 'auto',
+                  borderRadius: '4px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}
-              >
-                Summary
-              </button>
-              <button
-                onClick={() => setActiveTab('tags')}
-                style={{
-                  padding: '12px 0',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  borderBottom: activeTab === 'tags' ? '3px solid #2bd97c' : '3px solid transparent',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color: activeTab === 'tags' ? '#032b41' : '#6b757b',
-                  cursor: 'pointer'
-                }}
-              >
-                Tags
-              </button>
+              />
             </div>
           </div>
+
 
           {/* Tab Content */}
           {activeTab === 'summary' && (
@@ -461,6 +460,7 @@ export default function BookDetail() {
                       backgroundColor: '#f7faf9',
                       borderRadius: '20px',
                       fontSize: '14px',
+                      fontWeight: 'bold',
                       color: '#032b41'
                     }}>
                       {tag}
