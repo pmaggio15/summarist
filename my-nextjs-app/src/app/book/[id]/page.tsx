@@ -282,11 +282,6 @@ export default function BookDetail() {
               }}>
                 {book.subTitle}
               </p>
-              <hr style={{
-                border: 'none',
-                borderTop: '1px solid #e1e7ea',
-                margin: '24px 0'
-              }} />
 
               {/* Book Stats */}
               <div style={{ 
@@ -327,15 +322,11 @@ export default function BookDetail() {
                   <span style={{ fontSize: '14px', color: '#032b41' }}>{book.keyIdeas} Key ideas</span>
                 </div>
               </div>
-              <hr style={{
-                border: 'none',
-                borderTop: '1px solid #e1e7ea',
-                margin: '24px 0'
-              }} />
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
                 <button 
+                  onClick={() => router.push(`/player/${id}`)}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#1e4976';
                   }}
@@ -364,6 +355,7 @@ export default function BookDetail() {
                 </button>
 
                 <button 
+                  onClick={() => router.push(`/player/${id}`)}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#1e4976';
                   }}
@@ -435,6 +427,41 @@ export default function BookDetail() {
             </div>
           </div>
 
+          {/* Tabs */}
+          <div style={{ borderBottom: '1px solid #e1e7ea', marginBottom: '24px' }}>
+            <div style={{ display: 'inline-flex', gap: '32px' }}>
+              <button
+                onClick={() => setActiveTab('summary')}
+                style={{
+                  padding: '12px 0',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderBottom: activeTab === 'summary' ? '3px solid #2bd97c' : '3px solid transparent',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  color: activeTab === 'summary' ? '#032b41' : '#6b757b',
+                  cursor: 'pointer'
+                }}
+              >
+                Summary
+              </button>
+              <button
+                onClick={() => setActiveTab('tags')}
+                style={{
+                  padding: '12px 0',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderBottom: activeTab === 'tags' ? '3px solid #2bd97c' : '3px solid transparent',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  color: activeTab === 'tags' ? '#032b41' : '#6b757b',
+                  cursor: 'pointer'
+                }}
+              >
+                Tags
+              </button>
+            </div>
+          </div>
 
           {/* Tab Content */}
           {activeTab === 'summary' && (
@@ -460,7 +487,6 @@ export default function BookDetail() {
                       backgroundColor: '#f7faf9',
                       borderRadius: '20px',
                       fontSize: '14px',
-                      fontWeight: 'bold',
                       color: '#032b41'
                     }}>
                       {tag}
