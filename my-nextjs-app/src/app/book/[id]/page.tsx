@@ -67,7 +67,7 @@ export default function BookDetail() {
           const uniqueBooks = filtered.filter((book, index, self) =>
             index === self.findIndex((b) => b.id === book.id)
           );
-          setSearchResults(uniqueBooks.slice(0, 5));
+          setSearchResults(uniqueBooks);
           setShowSearchDropdown(true);
         })
         .catch(error => {
@@ -292,6 +292,10 @@ export default function BookDetail() {
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setSearchQuery('');
                     setShowSearchDropdown(false);
                     setSearchResults([]);
@@ -308,7 +312,8 @@ export default function BookDetail() {
                     right: '14px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    pointerEvents: 'auto'
                   }}
                 >
                   <line x1="18" y1="6" x2="6" y2="18"></line>

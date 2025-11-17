@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Add this interface
 interface Book {
   id: string;
   title: string;
@@ -74,7 +73,7 @@ export default function ForYou() {
           const uniqueBooks = filtered.filter((book, index, self) =>
             index === self.findIndex((b) => b.id === book.id)
           );
-          setSearchResults(uniqueBooks.slice(0, 5));
+          setSearchResults(uniqueBooks);
           setShowSearchDropdown(true);
         })
         .catch(error => {
@@ -294,6 +293,10 @@ export default function ForYou() {
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setSearchQuery('');
                       setShowSearchDropdown(false);
                       setSearchResults([]);
@@ -310,7 +313,8 @@ export default function ForYou() {
                       right: '14px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      pointerEvents: 'auto'
                     }}
                   >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -487,7 +491,7 @@ export default function ForYou() {
                 </div>
                 
                 <div style={{ 
-                  width: '1px', 
+                  width: '2px', 
                   height: '180px', 
                   backgroundColor: '#d4d4d4',
                   margin: '0'
