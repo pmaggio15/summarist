@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
+
 interface Book {
   id: string;
   title: string;
