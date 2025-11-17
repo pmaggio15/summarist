@@ -31,6 +31,9 @@ export default function BookDetail() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'summary' | 'tags'>('summary');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -46,6 +49,45 @@ export default function BookDetail() {
         });
     }
   }, [id]);
+
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      Promise.all([
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected').then(res => res.json()),
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended').then(res => res.json()),
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested').then(res => res.json())
+      ])
+        .then(([selected, recommended, suggested]) => {
+          const allBooks = [...selected, ...recommended, ...suggested];
+          const filtered = allBooks.filter((book: Book) => 
+            book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            book.author.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          const uniqueBooks = filtered.filter((book, index, self) =>
+            index === self.findIndex((b) => b.id === book.id)
+          );
+          setSearchResults(uniqueBooks.slice(0, 5));
+          setShowSearchDropdown(true);
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+        });
+    } else {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+    }
+  }, [searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleBookSelect = (bookId: string) => {
+    setSearchQuery('');
+    setShowSearchDropdown(false);
+    router.push(`/book/${bookId}`);
+  };
 
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
@@ -219,6 +261,9 @@ export default function BookDetail() {
             <input
               type="text"
               placeholder="Search for books"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
               style={{
                 width: '100%',
                 padding: '10px 40px 10px 16px',
@@ -230,25 +275,175 @@ export default function BookDetail() {
                 color: '#032b41'
               }}
             />
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="18" 
-              height="18" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="#032b41" 
-              strokeWidth="2.5"
-              style={{
+            {searchQuery ? (
+              <>
+                {/* Vertical divider line - full height */}
+                <div style={{
+                  position: 'absolute',
+                  right: '38px',
+                  top: 0,
+                  bottom: 0,
+                  width: '2px',
+                  backgroundColor: '#e1e7ea'
+                }}></div>
+                
+                {/* X icon when there's text */}
+                <svg 
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSearchQuery('');
+                    setShowSearchDropdown(false);
+                    setSearchResults([]);
+                  }}
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="18" 
+                  height="18" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#032b41" 
+                  strokeWidth="2.5"
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </>
+            ) : (
+              <>
+                {/* Vertical divider line - full height */}
+                <div style={{
+                  position: 'absolute',
+                  right: '38px',
+                  top: 0,
+                  bottom: 0,
+                  width: '2px',
+                  backgroundColor: '#e1e7ea'
+                }}></div>
+                
+                {/* Search icon when empty */}
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="18" 
+                  height="18" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#032b41" 
+                  strokeWidth="2.5"
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </>
+            )}
+
+            {/* Search Dropdown */}
+            {showSearchDropdown && searchResults.length > 0 && (
+              <div style={{
                 position: 'absolute',
-                right: '14px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                cursor: 'pointer'
-              }}
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
+                top: '100%',
+                left: 0,
+                right: 0,
+                backgroundColor: 'white',
+                border: '1px solid #e1e7ea',
+                borderRadius: '8px',
+                marginTop: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                maxHeight: '400px',
+                overflowY: 'auto',
+                zIndex: 1000
+              }}>
+                {searchResults.map((result) => (
+                  <div
+                    key={result.id}
+                    onClick={() => handleBookSelect(result.id)}
+                    style={{
+                      display: 'flex',
+                      gap: '16px',
+                      padding: '16px',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f0f0f0',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f7faf9';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'white';
+                    }}
+                  >
+                    <img
+                      src={result.imageLink}
+                      alt={result.title}
+                      style={{
+                        width: '60px',
+                        height: '80px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#032b41',
+                        marginBottom: '4px'
+                      }}>
+                        {result.title}
+                      </div>
+                      <div style={{
+                        fontSize: '14px',
+                        color: '#6b757b',
+                        marginBottom: '8px'
+                      }}>
+                        {result.author}
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '13px',
+                        color: '#6b757b'
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        03:24
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Close search when clicking outside */}
+            {showSearchDropdown && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 999
+                }}
+                onClick={() => setShowSearchDropdown(false)}
+              />
+            )}
           </div>
         </div>
 

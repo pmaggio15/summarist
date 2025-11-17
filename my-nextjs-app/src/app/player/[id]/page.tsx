@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 interface Book {
@@ -31,6 +31,13 @@ export default function Player() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [fontSize, setFontSize] = useState(16);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -39,20 +46,106 @@ export default function Player() {
         .then(data => {
           setBook(data);
           setLoading(false);
+          
+          // Initialize audio
+          if (data.audioLink) {
+            const audio = new Audio(data.audioLink);
+            audio.addEventListener('loadedmetadata', () => {
+              setDuration(audio.duration);
+            });
+            audio.addEventListener('timeupdate', () => {
+              setCurrentTime(audio.currentTime);
+            });
+            audio.addEventListener('ended', () => {
+              setIsPlaying(false);
+            });
+            audioRef.current = audio;
+          }
         })
         .catch(error => {
           console.error('Error:', error);
           setLoading(false);
         });
     }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
   }, [id]);
 
-  const increaseFontSize = () => {
-    if (fontSize < 24) setFontSize(fontSize + 2);
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      Promise.all([
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected').then(res => res.json()),
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended').then(res => res.json()),
+        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested').then(res => res.json())
+      ])
+        .then(([selected, recommended, suggested]) => {
+          const allBooks = [...selected, ...recommended, ...suggested];
+          const filtered = allBooks.filter((book: Book) => 
+            book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            book.author.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          const uniqueBooks = filtered.filter((book, index, self) =>
+            index === self.findIndex((b) => b.id === book.id)
+          );
+          setSearchResults(uniqueBooks.slice(0, 5));
+          setShowSearchDropdown(true);
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+        });
+    } else {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+    }
+  }, [searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const decreaseFontSize = () => {
-    if (fontSize > 12) setFontSize(fontSize - 2);
+  const handleBookSelect = (bookId: string) => {
+    setSearchQuery('');
+    setShowSearchDropdown(false);
+    router.push(`/book/${bookId}`);
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const skipForward = () => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, duration);
+  };
+
+  const skipBackward = () => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 10, 0);
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   if (loading) {
@@ -165,52 +258,112 @@ export default function Player() {
             borderTop: '1px solid #e1e7ea',
             marginTop: '20px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {/* Small Font */}
               <button
-                onClick={decreaseFontSize}
+                onClick={() => setFontSize(14)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  flex: 1,
+                  padding: '8px 4px',
                   border: 'none',
-                  backgroundColor: fontSize <= 12 ? '#e1e7ea' : '#032b41',
-                  color: 'white',
-                  borderRadius: '4px',
-                  cursor: fontSize <= 12 ? 'not-allowed' : 'pointer',
-                  fontSize: '20px',
+                  backgroundColor: 'transparent',
+                  color: '#032b41',
+                  borderBottom: fontSize === 14 ? '3px solid #2bd97c' : '3px solid transparent',
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
                 }}
-                disabled={fontSize <= 12}
               >
-                A
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="18px" width="18px" xmlns="http://www.w3.org/2000/svg">
+                  <g>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                  </g>
+                </svg>
               </button>
+
+              {/* Medium Font */}
               <button
-                onClick={increaseFontSize}
+                onClick={() => setFontSize(16)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  flex: 1,
+                  padding: '8px 4px',
                   border: 'none',
-                  backgroundColor: fontSize >= 24 ? '#e1e7ea' : '#032b41',
-                  color: 'white',
-                  borderRadius: '4px',
-                  cursor: fontSize >= 24 ? 'not-allowed' : 'pointer',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
+                  backgroundColor: 'transparent',
+                  color: '#032b41',
+                  borderBottom: fontSize === 16 ? '3px solid #2bd97c' : '3px solid transparent',
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
                 }}
-                disabled={fontSize >= 24}
               >
-                A
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="22px" width="22px" xmlns="http://www.w3.org/2000/svg">
+                  <g>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                  </g>
+                </svg>
+              </button>
+
+              {/* Large Font */}
+              <button
+                onClick={() => setFontSize(18)}
+                style={{
+                  flex: 1,
+                  padding: '8px 4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#032b41',
+                  borderBottom: fontSize === 18 ? '3px solid #2bd97c' : '3px solid transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="26px" width="26px" xmlns="http://www.w3.org/2000/svg">
+                  <g>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                  </g>
+                </svg>
+              </button>
+
+              {/* Extra Large Font */}
+              <button
+                onClick={() => setFontSize(20)}
+                style={{
+                  flex: 1,
+                  padding: '8px 4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#032b41',
+                  borderBottom: fontSize === 20 ? '3px solid #2bd97c' : '3px solid transparent',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="30px" width="30px" xmlns="http://www.w3.org/2000/svg">
+                  <g>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                  </g>
+                </svg>
               </button>
             </div>
           </div>
         </nav>
 
         {/* Bottom Navigation */}
-        <div style={{ position: 'absolute', bottom: '24px', width: '100%' }}>
+        <div style={{ position: 'absolute', bottom: '100px', width: '100%' }}>
           <div style={{
             padding: '12px 24px',
             display: 'flex',
@@ -264,8 +417,216 @@ export default function Player() {
         marginLeft: '200px',
         flex: 1,
         backgroundColor: 'white',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        paddingBottom: '100px'
       }}>
+        {/* Search Bar */}
+        <div style={{
+          padding: '24px 40px',
+          borderBottom: '1px solid #e1e7ea',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          backgroundColor: 'white'
+        }}>
+          <div style={{ position: 'relative', width: '340px' }}>
+            <input
+              type="text"
+              placeholder="Search for books"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
+              style={{
+                width: '100%',
+                padding: '10px 40px 10px 16px',
+                border: '2px solid #e1e7ea',
+                borderRadius: '8px',
+                fontSize: '14px',
+                outline: 'none',
+                backgroundColor: '#f7faf9',
+                color: '#032b41'
+              }}
+            />
+            {searchQuery ? (
+              <>
+                {/* Vertical divider line - full height */}
+                <div style={{
+                  position: 'absolute',
+                  right: '38px',
+                  top: 0,
+                  bottom: 0,
+                  width: '2px',
+                  backgroundColor: '#e1e7ea'
+                }}></div>
+                
+                {/* X icon when there's text */}
+                <svg 
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSearchQuery('');
+                    setShowSearchDropdown(false);
+                    setSearchResults([]);
+                  }}
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="18" 
+                  height="18" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#032b41" 
+                  strokeWidth="2.5"
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </>
+            ) : (
+              <>
+                {/* Vertical divider line - full height */}
+                <div style={{
+                  position: 'absolute',
+                  right: '38px',
+                  top: 0,
+                  bottom: 0,
+                  width: '2px',
+                  backgroundColor: '#e1e7ea'
+                }}></div>
+                
+                {/* Search icon when empty */}
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="18" 
+                  height="18" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#032b41" 
+                  strokeWidth="2.5"
+                  style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </>
+            )}
+
+            {/* Search Dropdown */}
+            {showSearchDropdown && searchResults.length > 0 && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                backgroundColor: 'white',
+                border: '1px solid #e1e7ea',
+                borderRadius: '8px',
+                marginTop: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                maxHeight: '400px',
+                overflowY: 'auto',
+                zIndex: 1000
+              }}>
+                {searchResults.map((result) => (
+                  <div
+                    key={result.id}
+                    onClick={() => handleBookSelect(result.id)}
+                    style={{
+                      display: 'flex',
+                      gap: '16px',
+                      padding: '16px',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f0f0f0',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f7faf9';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'white';
+                    }}
+                  >
+                    <img
+                      src={result.imageLink}
+                      alt={result.title}
+                      style={{
+                        width: '60px',
+                        height: '80px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#032b41',
+                        marginBottom: '4px'
+                      }}>
+                        {result.title}
+                      </div>
+                      <div style={{
+                        fontSize: '14px',
+                        color: '#6b757b',
+                        marginBottom: '8px'
+                      }}>
+                        {result.author}
+                      </div>
+                      {result.subTitle && (
+                        <div style={{
+                          fontSize: '13px',
+                          color: '#6b757b',
+                          marginBottom: '8px'
+                        }}>
+                          {result.subTitle}
+                        </div>
+                      )}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '13px',
+                        color: '#6b757b'
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        03:24
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Close search when clicking outside */}
+            {showSearchDropdown && (
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 999
+                }}
+                onClick={() => setShowSearchDropdown(false)}
+              />
+            )}
+          </div>
+        </div>
+
         {/* Content Area */}
         <div style={{ 
           maxWidth: '800px', 
@@ -288,22 +649,29 @@ export default function Player() {
             color: '#394547',
             marginBottom: '40px'
           }}>
-            {book.summary || book.bookDescription}
+            {(book.summary || book.bookDescription)?.split('\n').map((paragraph, index) => (
+              paragraph.trim() && (
+                <p key={index} style={{ marginBottom: '16px' }}>
+                  {paragraph}
+                </p>
+              )
+            ))}
           </div>
         </div>
 
-        {/* Audio Player Bar - Fixed at Bottom */}
+        {/* Audio Player Bar - Fixed at Bottom - Full Width */}
         <div style={{
           position: 'fixed',
           bottom: 0,
-          left: '200px',
+          left: 0,
           right: 0,
           backgroundColor: '#042330',
           padding: '16px 40px',
           display: 'flex',
           alignItems: 'center',
           gap: '24px',
-          boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 1000
         }}>
           {/* Book Cover Thumbnail */}
           <img 
@@ -337,7 +705,9 @@ export default function Player() {
           {/* Playback Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* Rewind 10s */}
-            <button style={{
+            <button 
+              onClick={skipBackward}
+              style={{
               width: '40px',
               height: '40px',
               borderRadius: '50%',
@@ -349,14 +719,15 @@ export default function Player() {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                <text x="12" y="16" textAnchor="middle" fill="currentColor" fontSize="10">10</text>
+              <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="28px" width="28px" xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke="currentColor" strokeWidth="2" d="M3.11111111,7.55555556 C4.66955145,4.26701301 8.0700311,2 12,2 C17.5228475,2 22,6.4771525 22,12 C22,17.5228475 17.5228475,22 12,22 L12,22 C6.4771525,22 2,17.5228475 2,12 M2,4 L2,8 L6,8 M9,16 L9,9 L7,9.53333333 M17,12 C17,10 15.9999999,8.5 14.5,8.5 C13.0000001,8.5 12,10 12,12 C12,14 13,15.5000001 14.5,15.5 C16,15.4999999 17,14 17,12 Z M14.5,8.5 C16.9253741,8.5 17,11 17,12 C17,13 17,15.5 14.5,15.5 C12,15.5 12,13 12,12 C12,11 12.059,8.5 14.5,8.5 Z"></path>
               </svg>
             </button>
 
-            {/* Play Button */}
-            <button style={{
+            {/* Play/Pause Button */}
+            <button 
+              onClick={togglePlayPause}
+              style={{
               width: '48px',
               height: '48px',
               borderRadius: '50%',
@@ -368,13 +739,24 @@ export default function Player() {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
+              {isPlaying ? (
+                // Pause Icon
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              ) : (
+                // Play Icon
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              )}
             </button>
 
             {/* Forward 10s */}
-            <button style={{
+            <button 
+              onClick={skipForward}
+              style={{
               width: '40px',
               height: '40px',
               borderRadius: '50%',
@@ -386,9 +768,8 @@ export default function Player() {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                <text x="12" y="16" textAnchor="middle" fill="currentColor" fontSize="10">10</text>
+              <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="28px" width="28px" xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke="currentColor" strokeWidth="2" d="M20.8888889,7.55555556 C19.3304485,4.26701301 15.9299689,2 12,2 C6.4771525,2 2,6.4771525 2,12 C2,17.5228475 6.4771525,22 12,22 L12,22 C17.5228475,22 22,17.5228475 22,12 M22,4 L22,8 L18,8 M9,16 L9,9 L7,9.53333333 M17,12 C17,10 15.9999999,8.5 14.5,8.5 C13.0000001,8.5 12,10 12,12 C12,14 13,15.5000001 14.5,15.5 C16,15.4999999 17,14 17,12 Z M14.5,8.5 C16.9253741,8.5 17,11 17,12 C17,13 17,15.5 14.5,15.5 C12,15.5 12,13 12,12 C12,11 12.059,8.5 14.5,8.5 Z"></path>
               </svg>
             </button>
           </div>
@@ -401,23 +782,31 @@ export default function Player() {
             color: 'white',
             fontSize: '14px'
           }}>
-            <span>00:01</span>
+            <span>{formatTime(currentTime)}</span>
             <div style={{
               flex: 1,
               height: '4px',
               backgroundColor: 'rgba(255, 255, 255, 0.3)',
               borderRadius: '2px',
               width: '300px',
-              position: 'relative'
-            }}>
+              position: 'relative',
+              cursor: 'pointer'
+            }}
+            onClick={(e) => {
+              if (!audioRef.current) return;
+              const rect = e.currentTarget.getBoundingClientRect();
+              const percent = (e.clientX - rect.left) / rect.width;
+              audioRef.current.currentTime = percent * duration;
+            }}
+            >
               <div style={{
                 height: '100%',
                 backgroundColor: 'white',
                 borderRadius: '2px',
-                width: '10%'
+                width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
               }}></div>
             </div>
-            <span>03:24</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
       </main>
