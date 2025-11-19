@@ -1,9 +1,485 @@
+// 'use client';
+
+// import Image from 'next/image';
+// import { useState, useEffect } from 'react';
+// import { useRouter, useParams } from 'next/navigation';
+// import { useLibrary } from '../../LibraryContext';
+
+// interface Book {
+//   id: string;
+//   title: string;
+//   author: string;
+//   subTitle: string;
+//   imageLink: string;
+//   audioLink: string;
+//   totalRating: number;
+//   averageRating: number;
+//   keyIdeas: number;
+//   type: string;
+//   status: string;
+//   subscriptionRequired: boolean;
+//   summary: string;
+//   tags: string[];
+//   bookDescription: string;
+//   authorDescription: string;
+// }
+
+// export default function BookDetail() {
+//   const router = useRouter();
+//   const params = useParams();
+//   const id = params?.id as string;
+  
+//   const [book, setBook] = useState<Book | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [activeTab, setActiveTab] = useState<'summary' | 'tags'>('summary');
+  
+//   // Add save functionality
+//   const { addToSaved, removeFromSaved, isBookSaved } = useLibrary();
+//   const bookIsSaved = book ? isBookSaved(book.id) : false;
+
+//   useEffect(() => {
+//     if (id) {
+//       fetch(`https://us-central1-summaristt.cloudfunctions.net/getBook?id=${id}`)
+//         .then(res => res.json())
+//         .then(data => {
+//           setBook(data);
+//           setLoading(false);
+//         })
+//         .catch(error => {
+//           console.error('Error:', error);
+//           setLoading(false);
+//         });
+//     }
+//   }, [id]);
+
+//   // Handler for save/unsave
+//   const handleSaveToggle = () => {
+//     if (!book) return;
+    
+//     if (bookIsSaved) {
+//       removeFromSaved(book.id);
+//     } else {
+//       addToSaved(book);
+//     }
+//   };
+
+//   if (loading) {
+//     return (
+//       <div style={{ 
+//         display: 'flex', 
+//         justifyContent: 'center', 
+//         alignItems: 'center', 
+//         minHeight: '100vh' 
+//       }}>
+//         <div style={{ fontSize: '18px', color: '#6b757b' }}>Loading...</div>
+//       </div>
+//     );
+//   }
+
+//   if (!book) {
+//     return (
+//       <div style={{ 
+//         display: 'flex', 
+//         justifyContent: 'center', 
+//         alignItems: 'center', 
+//         minHeight: '100vh' 
+//       }}>
+//         <div style={{ fontSize: '18px', color: '#6b757b' }}>Book not found</div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div style={{ display: 'flex', minHeight: '100vh' }}>
+//       {/* Sidebar */}
+//       <aside style={{
+//         width: '200px',
+//         backgroundColor: '#f7faf9',
+//         padding: '24px 0',
+//         borderRight: '1px solid #e1e7ea',
+//         position: 'fixed',
+//         height: '100vh',
+//         left: 0,
+//         top: 0
+//       }}>
+//         <div style={{ padding: '0 24px', marginBottom: '40px' }}>
+//           <Image 
+//             src="/logo.png" 
+//             alt="Summarist logo"
+//             width={150}
+//             height={40}
+//             style={{ objectFit: 'contain' }}
+//           />
+//         </div>
+
+//         <nav>
+//           <div 
+//             onClick={() => router.push('/for-you')}
+//             style={{
+//               padding: '12px 24px',
+//               display: 'flex',
+//               alignItems: 'center',
+//               gap: '12px',
+//               color: '#394547',
+//               cursor: 'pointer'
+//             }}
+//           >
+//             <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="24" width="24">
+//               <path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"></path>
+//             </svg>
+//             For you
+//           </div>
+
+//           <div 
+//             onClick={() => router.push('/library')}
+//             style={{
+//               padding: '12px 24px',
+//               display: 'flex',
+//               alignItems: 'center',
+//               gap: '12px',
+//               color: '#394547',
+//               cursor: 'pointer'
+//             }}
+//           >
+//             <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="24" width="24">
+//               <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
+//             </svg>
+//             My Library
+//           </div>
+//         </nav>
+//       </aside>
+
+//       {/* Main Content */}
+//       <main style={{
+//         marginLeft: '200px',
+//         flex: 1,
+//         backgroundColor: 'white'
+//       }}>
+//         <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto' }}>
+//           {/* Book Header Section */}
+//           <div style={{ display: 'flex', gap: '40px', marginBottom: '40px' }}>
+//             {/* Book Cover */}
+//             <div style={{ flexShrink: 0 }}>
+//               <img 
+//                 src={book.imageLink} 
+//                 alt={book.title}
+//                 style={{ 
+//                   width: '200px', 
+//                   height: '300px', 
+//                   objectFit: 'cover', 
+//                   borderRadius: '8px',
+//                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+//                 }}
+//               />
+//             </div>
+            
+//             {/* Book Details */}
+//             <div style={{ flex: 1 }}>
+//               {/* Subscription Badge */}
+//               {book.subscriptionRequired && (
+//                 <div style={{
+//                   display: 'inline-block',
+//                   backgroundColor: '#032b41',
+//                   color: 'white',
+//                   padding: '4px 12px',
+//                   borderRadius: '4px',
+//                   fontSize: '12px',
+//                   fontWeight: 'bold',
+//                   marginBottom: '12px'
+//                 }}>
+//                   Premium
+//                 </div>
+//               )}
+
+//               {/* Title */}
+//               <h1 style={{ 
+//                 fontSize: '32px', 
+//                 fontWeight: 'bold', 
+//                 color: '#032b41', 
+//                 marginBottom: '12px',
+//                 lineHeight: '1.2'
+//               }}>
+//                 {book.title}
+//               </h1>
+              
+//               {/* Author */}
+//               <p style={{ 
+//                 fontSize: '18px', 
+//                 color: '#6b757b', 
+//                 marginBottom: '20px' 
+//               }}>
+//                 {book.author}
+//               </p>
+              
+//               {/* Subtitle */}
+//               <p style={{ 
+//                 fontSize: '16px', 
+//                 color: '#394547', 
+//                 marginBottom: '20px',
+//                 lineHeight: '1.5'
+//               }}>
+//                 {book.subTitle}
+//               </p>
+              
+//               {/* Action Buttons */}
+//               <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+//                 <button 
+//                   onClick={() => router.push(`/player/${book.id}`)}
+//                   style={{
+//                     padding: '12px 24px',
+//                     backgroundColor: '#032b41',
+//                     color: 'white',
+//                     border: 'none',
+//                     borderRadius: '6px',
+//                     fontSize: '16px',
+//                     fontWeight: '500',
+//                     cursor: 'pointer',
+//                     display: 'flex',
+//                     alignItems: 'center',
+//                     gap: '8px',
+//                     transition: 'background-color 0.2s'
+//                   }}
+//                   onMouseEnter={(e) => {
+//                     e.currentTarget.style.backgroundColor = '#024130';
+//                   }}
+//                   onMouseLeave={(e) => {
+//                     e.currentTarget.style.backgroundColor = '#032b41';
+//                   }}
+//                 >
+//                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+//                     <path d="M8 5v14l11-7z"/>
+//                   </svg>
+//                   Read
+//                 </button>
+                
+//                 <button 
+//                   onClick={() => router.push(`/player/${book.id}`)}
+//                   style={{
+//                     padding: '12px 24px',
+//                     backgroundColor: 'white',
+//                     color: '#032b41',
+//                     border: '2px solid #032b41',
+//                     borderRadius: '6px',
+//                     fontSize: '16px',
+//                     fontWeight: '500',
+//                     cursor: 'pointer',
+//                     display: 'flex',
+//                     alignItems: 'center',
+//                     gap: '8px',
+//                     transition: 'background-color 0.2s'
+//                   }}
+//                   onMouseEnter={(e) => {
+//                     e.currentTarget.style.backgroundColor = '#f7faf9';
+//                   }}
+//                   onMouseLeave={(e) => {
+//                     e.currentTarget.style.backgroundColor = 'white';
+//                   }}
+//                 >
+//                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+//                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+//                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+//                   </svg>
+//                   Listen
+//                 </button>
+//               </div>
+              
+//               {/* Save to Library Button */}
+//               <button 
+//                 onClick={handleSaveToggle}
+//                 onMouseEnter={(e) => {
+//                   e.currentTarget.style.color = '#024bb5';
+//                 }}
+//                 onMouseLeave={(e) => {
+//                   e.currentTarget.style.color = '#0365f2';
+//                 }}
+//                 style={{
+//                   padding: '0',
+//                   backgroundColor: 'transparent',
+//                   color: '#0365f2',
+//                   border: 'none',
+//                   fontSize: '16px',
+//                   fontWeight: '500',
+//                   cursor: 'pointer',
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   gap: '8px',
+//                   transition: 'color 0.2s ease',
+//                   marginBottom: '24px'
+//                 }}
+//               >
+//                 {bookIsSaved ? (
+//                   <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+//                     <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+//                   </svg>
+//                 ) : (
+//                   <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+//                     <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
+//                   </svg>
+//                 )}
+//                 {bookIsSaved ? 'Saved in My Library' : 'Add title to My Library'}
+//               </button>
+              
+//               {/* Stats */}
+//               <div style={{ 
+//                 display: 'flex', 
+//                 flexWrap: 'wrap',
+//                 gap: '24px',
+//                 padding: '16px 0',
+//                 borderTop: '1px solid #e1e7ea',
+//                 borderBottom: '1px solid #e1e7ea'
+//               }}>
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+//                   <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+//                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+//                   </svg>
+//                   <span style={{ color: '#032b41', fontWeight: '500' }}>
+//                     {book.averageRating}
+//                   </span>
+//                   <span style={{ color: '#6b757b', fontSize: '14px' }}>
+//                     ({book.totalRating} ratings)
+//                   </span>
+//                 </div>
+                
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+//                   <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+//                     <circle cx="12" cy="12" r="10"></circle>
+//                     <polyline points="12 6 12 12 16 14"></polyline>
+//                   </svg>
+//                   <span style={{ color: '#032b41', fontWeight: '500' }}>
+//                     03:24
+//                   </span>
+//                 </div>
+                
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+//                   <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+//                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+//                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+//                   </svg>
+//                   <span style={{ color: '#032b41', fontWeight: '500' }}>
+//                     {book.keyIdeas} Key Ideas
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Tabs */}
+//           <div style={{ 
+//             borderBottom: '2px solid #e1e7ea',
+//             marginBottom: '32px'
+//           }}>
+//             <div style={{ display: 'flex', gap: '32px' }}>
+//               <button
+//                 onClick={() => setActiveTab('summary')}
+//                 style={{
+//                   padding: '16px 0',
+//                   backgroundColor: 'transparent',
+//                   border: 'none',
+//                   borderBottom: activeTab === 'summary' ? '3px solid #2bd97c' : '3px solid transparent',
+//                   color: activeTab === 'summary' ? '#032b41' : '#6b757b',
+//                   fontSize: '16px',
+//                   fontWeight: '600',
+//                   cursor: 'pointer',
+//                   transition: 'all 0.2s'
+//                 }}
+//               >
+//                 Summary
+//               </button>
+//               <button
+//                 onClick={() => setActiveTab('tags')}
+//                 style={{
+//                   padding: '16px 0',
+//                   backgroundColor: 'transparent',
+//                   border: 'none',
+//                   borderBottom: activeTab === 'tags' ? '3px solid #2bd97c' : '3px solid transparent',
+//                   color: activeTab === 'tags' ? '#032b41' : '#6b757b',
+//                   fontSize: '16px',
+//                   fontWeight: '600',
+//                   cursor: 'pointer',
+//                   transition: 'all 0.2s'
+//                 }}
+//               >
+//                 Tags
+//               </button>
+//             </div>
+//           </div>
+
+//           {/* Tab Content */}
+//           {activeTab === 'summary' ? (
+//             <div>
+//               <p style={{ 
+//                 fontSize: '16px', 
+//                 color: '#394547', 
+//                 lineHeight: '1.8',
+//                 marginBottom: '32px'
+//               }}>
+//                 {book.summary}
+//               </p>
+              
+//               <h2 style={{ 
+//                 fontSize: '24px', 
+//                 fontWeight: 'bold', 
+//                 color: '#032b41', 
+//                 marginBottom: '16px' 
+//               }}>
+//                 What's it about?
+//               </h2>
+//               <p style={{ 
+//                 fontSize: '16px', 
+//                 color: '#394547', 
+//                 lineHeight: '1.8',
+//                 marginBottom: '32px'
+//               }}>
+//                 {book.bookDescription}
+//               </p>
+              
+//               <h2 style={{ 
+//                 fontSize: '24px', 
+//                 fontWeight: 'bold', 
+//                 color: '#032b41', 
+//                 marginBottom: '16px' 
+//               }}>
+//                 About the author
+//               </h2>
+//               <p style={{ 
+//                 fontSize: '16px', 
+//                 color: '#394547', 
+//                 lineHeight: '1.8'
+//               }}>
+//                 {book.authorDescription}
+//               </p>
+//             </div>
+//           ) : (
+//             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+//               {book.tags.map((tag, index) => (
+//                 <span
+//                   key={index}
+//                   style={{
+//                     padding: '8px 16px',
+//                     backgroundColor: '#f7faf9',
+//                     color: '#032b41',
+//                     borderRadius: '20px',
+//                     fontSize: '14px',
+//                     fontWeight: '500'
+//                   }}
+//                 >
+//                   {tag}
+//                 </span>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
+
 'use client';
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-
+import { useLibrary } from '../../LibraryContext';
 
 interface Book {
   id: string;
@@ -32,9 +508,10 @@ export default function BookDetail() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'summary' | 'tags'>('summary');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Book[]>([]);
-  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  
+  // Add save functionality
+  const { addToSaved, removeFromSaved, isBookSaved } = useLibrary();
+  const bookIsSaved = book ? isBookSaved(book.id) : false;
 
   useEffect(() => {
     if (id) {
@@ -51,51 +528,41 @@ export default function BookDetail() {
     }
   }, [id]);
 
-  // Search functionality
-  useEffect(() => {
-    if (searchQuery.trim().length > 0) {
-      Promise.all([
-        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected').then(res => res.json()),
-        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended').then(res => res.json()),
-        fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested').then(res => res.json())
-      ])
-        .then(([selected, recommended, suggested]) => {
-          const allBooks = [...selected, ...recommended, ...suggested];
-          const filtered = allBooks.filter((book: Book) => 
-            book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            book.author.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          const uniqueBooks = filtered.filter((book, index, self) =>
-            index === self.findIndex((b) => b.id === book.id)
-          );
-          setSearchResults(uniqueBooks);
-          setShowSearchDropdown(true);
-        })
-        .catch(error => {
-          console.error('Search error:', error);
-        });
+  // Handler for save/unsave
+  const handleSaveToggle = () => {
+    if (!book) return;
+    
+    if (bookIsSaved) {
+      removeFromSaved(book.id);
     } else {
-      setSearchResults([]);
-      setShowSearchDropdown(false);
+      addToSaved(book);
     }
-  }, [searchQuery]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleBookSelect = (bookId: string) => {
-    setSearchQuery('');
-    setShowSearchDropdown(false);
-    router.push(`/book/${bookId}`);
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh' 
+      }}>
+        <div style={{ fontSize: '18px', color: '#6b757b' }}>Loading...</div>
+      </div>
+    );
   }
 
   if (!book) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Book not found</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh' 
+      }}>
+        <div style={{ fontSize: '18px', color: '#6b757b' }}>Book not found</div>
+      </div>
+    );
   }
 
   return (
@@ -111,7 +578,6 @@ export default function BookDetail() {
         left: 0,
         top: 0
       }}>
-        {/* Logo */}
         <div style={{ padding: '0 24px', marginBottom: '40px' }}>
           <Image 
             src="/logo.png" 
@@ -122,20 +588,20 @@ export default function BookDetail() {
           />
         </div>
 
-        {/* Navigation */}
         <nav>
           <div 
             onClick={() => router.push('/for-you')}
             style={{
-            padding: '12px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            color: '#394547',
-            fontWeight: '400',
-            fontSize: '16px',
-            cursor: 'pointer'
-          }}>
+              padding: '12px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              color: '#394547',
+              fontWeight: '400',
+              fontSize: '16px',
+              cursor: 'pointer'
+            }}
+          >
             <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
               <path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"></path>
             </svg>
@@ -145,22 +611,23 @@ export default function BookDetail() {
           <div 
             onClick={() => router.push('/library')}
             style={{
-            padding: '12px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            color: '#394547',
-            fontWeight: '400',
-            fontSize: '16px',
-            cursor: 'pointer'
-          }}>
+              padding: '12px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              color: '#394547',
+              fontWeight: '400',
+              fontSize: '16px',
+              cursor: 'pointer'
+            }}
+          >
             <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
             </svg>
             My Library
           </div>
 
-         <div style={{
+          <div style={{
             padding: '12px 24px',
             display: 'flex',
             alignItems: 'center',
@@ -169,14 +636,14 @@ export default function BookDetail() {
             fontWeight: '400',
             fontSize: '16px',
             cursor: 'not-allowed'
-            }}>
-              <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
-                <g>
-                  <path fill="none" d="M0 0h24v24H0z"></path>
-                  <path d="M17.849 11.808l-.707-.707-9.9 9.9H3v-4.243L14.313 5.444l5.657 5.657a1 1 0 0 1 0 1.414l-7.07 7.071-1.415-1.414 6.364-6.364zm-2.121-2.121l-1.415-1.414L5 17.586v1.415h1.414l9.314-9.314zm2.828-7.071l2.829 2.828a1 1 0 0 1 0 1.414L19.97 8.273 15.728 4.03l1.414-1.414a1 1 0 0 1 1.414 0z"></path>
-                </g>
-              </svg>
-              Highlights
+          }}>
+            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+              <g>
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path d="M17.849 11.808l-.707-.707-9.9 9.9H3v-4.243L14.313 5.444l5.657 5.657a1 1 0 0 1 0 1.414l-7.07 7.071-1.415-1.414 6.364-6.364zm-2.121-2.121l-1.415-1.414L5 17.586v1.415h1.414l9.314-9.314zm2.828-7.071l2.829 2.828a1 1 0 0 1 0 1.414L19.97 8.273 15.728 4.03l1.414-1.414a1 1 0 0 1 1.414 0z"></path>
+              </g>
+            </svg>
+            Highlights
           </div>
 
           <div style={{
@@ -251,342 +718,137 @@ export default function BookDetail() {
         flex: 1,
         backgroundColor: 'white'
       }}>
-        {/* Search Bar */}
-        <div style={{
-          padding: '24px 40px',
-          borderBottom: '1px solid #e1e7ea',
-          display: 'flex',
-          justifyContent: 'flex-end'
-        }}>
-          <div style={{ position: 'relative', width: '340px' }}>
-            <input
-              type="text"
-              placeholder="Search for books"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => searchQuery && setShowSearchDropdown(true)}
-              style={{
-                width: '100%',
-                padding: '10px 40px 10px 16px',
-                border: '2px solid #e1e7ea',
-                borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                backgroundColor: '#f7faf9',
-                color: '#032b41'
-              }}
-            />
-            {searchQuery ? (
-              <>
-                {/* Vertical divider line - full height */}
-                <div style={{
-                  position: 'absolute',
-                  right: '38px',
-                  top: 0,
-                  bottom: 0,
-                  width: '2px',
-                  backgroundColor: '#e1e7ea'
-                }}></div>
-                
-                {/* X icon when there's text */}
-                <svg 
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSearchQuery('');
-                    setShowSearchDropdown(false);
-                    setSearchResults([]);
-                  }}
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="18" 
-                  height="18" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#032b41" 
-                  strokeWidth="2.5"
-                  style={{
-                    position: 'absolute',
-                    right: '14px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer',
-                    pointerEvents: 'auto'
-                  }}
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </>
-            ) : (
-              <>
-                {/* Vertical divider line - full height */}
-                <div style={{
-                  position: 'absolute',
-                  right: '38px',
-                  top: 0,
-                  bottom: 0,
-                  width: '2px',
-                  backgroundColor: '#e1e7ea'
-                }}></div>
-                
-                {/* Search icon when empty */}
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="18" 
-                  height="18" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="#032b41" 
-                  strokeWidth="2.5"
-                  style={{
-                    position: 'absolute',
-                    right: '14px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.35-4.35"></path>
-                </svg>
-              </>
-            )}
-
-            {/* Search Dropdown */}
-            {showSearchDropdown && searchResults.length > 0 && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                backgroundColor: 'white',
-                border: '1px solid #e1e7ea',
-                borderRadius: '8px',
-                marginTop: '8px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                maxHeight: '400px',
-                overflowY: 'auto',
-                zIndex: 1000
-              }}>
-                {searchResults.map((result) => (
-                  <div
-                    key={result.id}
-                    onClick={() => handleBookSelect(result.id)}
-                    style={{
-                      display: 'flex',
-                      gap: '16px',
-                      padding: '16px',
-                      cursor: 'pointer',
-                      borderBottom: '1px solid #f0f0f0',
-                      transition: 'background-color 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f7faf9';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'white';
-                    }}
-                  >
-                    <img
-                      src={result.imageLink}
-                      alt={result.title}
-                      style={{
-                        width: '60px',
-                        height: '80px',
-                        objectFit: 'cover',
-                        borderRadius: '4px'
-                      }}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        color: '#032b41',
-                        marginBottom: '4px'
-                      }}>
-                        {result.title}
-                      </div>
-                      <div style={{
-                        fontSize: '14px',
-                        color: '#6b757b',
-                        marginBottom: '8px'
-                      }}>
-                        {result.author}
-                      </div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '13px',
-                        color: '#6b757b'
-                      }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        03:24
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Close search when clicking outside */}
-            {showSearchDropdown && (
-              <div
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 999
-                }}
-                onClick={() => setShowSearchDropdown(false)}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Book Content */}
-        <div style={{ padding: '40px', maxWidth: '1100px' }}>
-          {/* Book Header */}
+        <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto' }}>
+          {/* Book Header Section */}
           <div style={{ display: 'flex', gap: '40px', marginBottom: '40px' }}>
-            {/* Book Info */}
+            {/* Book Cover */}
+            <div style={{ flexShrink: 0 }}>
+              <img 
+                src={book.imageLink} 
+                alt={book.title}
+                style={{ 
+                  width: '200px', 
+                  height: '300px', 
+                  objectFit: 'cover', 
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            </div>
+            
+            {/* Book Details */}
             <div style={{ flex: 1 }}>
-              <h1 style={{
-                fontSize: '32px',
-                fontWeight: 'bold',
-                color: '#032b41',
-                marginBottom: '12px'
+              {/* Subscription Badge */}
+              {book.subscriptionRequired && (
+                <div style={{
+                  display: 'inline-block',
+                  backgroundColor: '#032b41',
+                  color: 'white',
+                  padding: '4px 12px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  marginBottom: '12px'
+                }}>
+                  Premium
+                </div>
+              )}
+
+              {/* Title */}
+              <h1 style={{ 
+                fontSize: '32px', 
+                fontWeight: 'bold', 
+                color: '#032b41', 
+                marginBottom: '12px',
+                lineHeight: '1.2'
               }}>
                 {book.title}
               </h1>
               
-              <p style={{
-                fontSize: '18px',
-                color: '#032b41',
-                marginBottom: '16px'
+              {/* Author */}
+              <p style={{ 
+                fontSize: '18px', 
+                color: '#6b757b', 
+                marginBottom: '20px' 
               }}>
                 {book.author}
               </p>
-
-              <p style={{
-                fontSize: '16px',
-                color: '#6b757b',
-                marginBottom: '24px'
+              
+              {/* Subtitle */}
+              <p style={{ 
+                fontSize: '16px', 
+                color: '#394547', 
+                marginBottom: '20px',
+                lineHeight: '1.5'
               }}>
                 {book.subTitle}
               </p>
-
-              {/* Book Stats */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '16px', 
-                marginBottom: '24px',
-                maxWidth: '500px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 0 0 .6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0 0 46.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3zM664.8 561.6l36.1 210.3L512 672.7 323.1 772l36.1-210.3-152.8-149L417.6 382 512 190.7 606.4 382l211.2 30.7-152.8 148.9z"></path>
-                  </svg>
-                  <span style={{ fontSize: '14px', color: '#032b41' }}>
-                    {book.averageRating} ({book.totalRating} ratings)
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path>
-                    <path d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"></path>
-                  </svg>
-                  <span style={{ fontSize: '14px', color: '#032b41' }}>03:24</span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 1024 1024" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M842 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 140.3-113.7 254-254 254S258 594.3 258 454c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8 0 168.7 126.6 307.9 290 327.6V884H326.7c-13.7 0-24.7 14.3-24.7 32v36c0 4.4 2.8 8 6.2 8h407.6c3.4 0 6.2-3.6 6.2-8v-36c0-17.7-11-32-24.7-32H548V782.1c165.3-18 294-158 294-328.1zM512 624c93.9 0 170-75.2 170-168V232c0-92.8-76.1-168-170-168s-170 75.2-170 168v224c0 92.8 76.1 168 170 168zm-94-392c0-50.6 41.9-92 94-92s94 41.4 94 92v224c0 50.6-41.9 92-94 92s-94-41.4-94-92V232z"></path>
-                  </svg>
-                  <span style={{ fontSize: '14px', color: '#032b41' }}>Audio & Text</span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                  </svg>
-                  <span style={{ fontSize: '14px', color: '#032b41' }}>{book.keyIdeas} Key ideas</span>
-                </div>
-              </div>
-
+              
               {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
                 <button 
-                  onClick={() => router.push(`/player/${id}`)}
+                  onClick={() => router.push(`/choose-plan`)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#032b41',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'background-color 0.2s'
+                  }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1e4976';
+                    e.currentTarget.style.backgroundColor = '#024130';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#032b41';
                   }}
-                  style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#032b41',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'background-color 0.2s ease'
-                }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
                   </svg>
                   Read
                 </button>
-
+                
                 <button 
-                  onClick={() => router.push(`/player/${id}`)}
+                  onClick={() => router.push(`/player/${book.id}`)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: 'white',
+                    color: '#032b41',
+                    border: '2px solid #032b41',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'background-color 0.2s'
+                  }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1e4976';
+                    e.currentTarget.style.backgroundColor = '#f7faf9';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#032b41';
+                    e.currentTarget.style.backgroundColor = 'white';
                   }}
-                  style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#032b41',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'background-color 0.2s ease'
-                }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" x2="12" y1="19" y2="22"></line>
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                   </svg>
                   Listen
                 </button>
               </div>
-
+              
+              {/* Save to Library Button */}
               <button 
+                onClick={handleSaveToggle}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#024bb5';
                 }}
@@ -594,54 +856,94 @@ export default function BookDetail() {
                   e.currentTarget.style.color = '#0365f2';
                 }}
                 style={{
-                padding: '0',
-                backgroundColor: 'transparent',
-                color: '#0365f2',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'color 0.2s ease'
-              }}>
-                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
-                </svg>
-                Add title to My Library
-              </button>
-            </div>
-
-            {/* Book Cover - Moved to Right */}
-            <div style={{ width: '250px', flexShrink: 0 }}>
-              <img 
-                src={book.imageLink} 
-                alt={book.title}
-                style={{ 
-                  width: '100%', 
-                  height: 'auto',
-                  borderRadius: '4px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  padding: '0',
+                  backgroundColor: 'transparent',
+                  color: '#0365f2',
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'color 0.2s ease',
+                  marginBottom: '24px'
                 }}
-              />
+              >
+                {bookIsSaved ? (
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+                  </svg>
+                ) : (
+                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"></path>
+                  </svg>
+                )}
+                {bookIsSaved ? 'Saved in My Library' : 'Add title to My Library'}
+              </button>
+              
+              {/* Stats */}
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: '24px',
+                padding: '16px 0',
+                borderTop: '1px solid #e1e7ea',
+                borderBottom: '1px solid #e1e7ea'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span style={{ color: '#032b41', fontWeight: '500' }}>
+                    {book.averageRating}
+                  </span>
+                  <span style={{ color: '#6b757b', fontSize: '14px' }}>
+                    ({book.totalRating} ratings)
+                  </span>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span style={{ color: '#032b41', fontWeight: '500' }}>
+                    03:24
+                  </span>
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="20" width="20">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  <span style={{ color: '#032b41', fontWeight: '500' }}>
+                    {book.keyIdeas} Key Ideas
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div style={{ borderBottom: '1px solid #e1e7ea', marginBottom: '24px' }}>
-            <div style={{ display: 'inline-flex', gap: '32px' }}>
+          <div style={{ 
+            borderBottom: '2px solid #e1e7ea',
+            marginBottom: '32px'
+          }}>
+            <div style={{ display: 'flex', gap: '32px' }}>
               <button
                 onClick={() => setActiveTab('summary')}
                 style={{
-                  padding: '12px 0',
+                  padding: '16px 0',
                   backgroundColor: 'transparent',
                   border: 'none',
                   borderBottom: activeTab === 'summary' ? '3px solid #2bd97c' : '3px solid transparent',
-                  fontSize: '16px',
-                  fontWeight: '500',
                   color: activeTab === 'summary' ? '#032b41' : '#6b757b',
-                  cursor: 'pointer'
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
                 }}
               >
                 Summary
@@ -649,14 +951,15 @@ export default function BookDetail() {
               <button
                 onClick={() => setActiveTab('tags')}
                 style={{
-                  padding: '12px 0',
+                  padding: '16px 0',
                   backgroundColor: 'transparent',
                   border: 'none',
                   borderBottom: activeTab === 'tags' ? '3px solid #2bd97c' : '3px solid transparent',
-                  fontSize: '16px',
-                  fontWeight: '500',
                   color: activeTab === 'tags' ? '#032b41' : '#6b757b',
-                  cursor: 'pointer'
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
                 }}
               >
                 Tags
@@ -665,91 +968,67 @@ export default function BookDetail() {
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'summary' && (
+          {activeTab === 'summary' ? (
             <div>
-              <div style={{ marginBottom: '32px' }}>
-                <h3 style={{
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  color: '#032b41',
-                  marginBottom: '12px'
-                }}>
-                  What&apos;s it about?
-                </h3>
-                <div style={{
-                  display: 'flex',
-                  gap: '12px',
-                  flexWrap: 'wrap',
-                  marginBottom: '16px'
-                }}>
-                  {book.tags && book.tags.map((tag, index) => (
-                    <span key={index} style={{
-                      padding: '6px 16px',
-                      backgroundColor: '#f7faf9',
-                      borderRadius: '20px',
-                      fontSize: '14px',
-                      color: '#032b41'
-                    }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <p style={{
-                  fontSize: '16px',
-                  lineHeight: '1.6',
-                  color: '#394547'
-                }}>
-                  {book.bookDescription}
-                </p>
-              </div>
-
-              <div>
-                <h3 style={{
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  color: '#032b41',
-                  marginBottom: '12px'
-                }}>
-                  About the author
-                </h3>
-                <p style={{
-                  fontSize: '16px',
-                  lineHeight: '1.6',
-                  color: '#394547'
-                }}>
-                  {book.authorDescription}
-                </p>
-              </div>
+              <p style={{ 
+                fontSize: '16px', 
+                color: '#394547', 
+                lineHeight: '1.8',
+                marginBottom: '32px'
+              }}>
+                {book.summary}
+              </p>
+              
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                color: '#032b41', 
+                marginBottom: '16px' 
+              }}>
+                What's it about?
+              </h2>
+              <p style={{ 
+                fontSize: '16px', 
+                color: '#394547', 
+                lineHeight: '1.8',
+                marginBottom: '32px'
+              }}>
+                {book.bookDescription}
+              </p>
+              
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                color: '#032b41', 
+                marginBottom: '16px' 
+              }}>
+                About the author
+              </h2>
+              <p style={{ 
+                fontSize: '16px', 
+                color: '#394547', 
+                lineHeight: '1.8'
+              }}>
+                {book.authorDescription}
+              </p>
             </div>
-          )}
-
-          {activeTab === 'tags' && (
-            <div>
-              <h3 style={{
-                fontSize: '20px',
-                fontWeight: 'bold',
-                color: '#032b41',
-                marginBottom: '16px'
-              }}>
-                Tags
-              </h3>
-              <div style={{
-                display: 'flex',
-                gap: '12px',
-                flexWrap: 'wrap'
-              }}>
-                {book.tags && book.tags.map((tag, index) => (
-                  <span key={index} style={{
-                    padding: '8px 20px',
+          ) : (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+              {book.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  style={{
+                    padding: '8px 16px',
                     backgroundColor: '#f7faf9',
+                    color: '#032b41',
                     borderRadius: '20px',
-                    fontSize: '16px',
-                    color: '#032b41'
-                  }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
         </div>
