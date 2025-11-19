@@ -893,44 +893,21 @@
 //     </div>
 //   );
 // }
-
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ChoosePlan() {
   const router = useRouter();
-  const [openFaq, setOpenFaq] = useState<number | null>(0); // First FAQ open by default
-  const [isSticky, setIsSticky] = useState(true); // Control sticky button
+  const [openFaq, setOpenFaq] = useState<number | null>(0); 
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  // Check if FAQ section is in viewport
-  useEffect(() => {
-    const handleScroll = () => {
-      const faqSection = document.getElementById('faq-section');
-      if (faqSection) {
-        const rect = faqSection.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        
-        // If FAQ section reaches the bottom of the viewport, stop sticky
-        if (rect.top <= windowHeight) {
-          setIsSticky(false);
-        } else {
-          setIsSticky(true);
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial position
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'white' }}>
@@ -1072,44 +1049,6 @@ export default function ChoosePlan() {
                     <span style={{ fontWeight: '600' }}>Precise recommendations</span> collections curated by experts
                 </div>
             </div>
-          </div>
-
-          {/* CTA Section */}
-          <div style={{
-            textAlign: 'center',
-            maxWidth: '500px',
-            margin: '0 auto'
-          }}>
-            <button
-              onClick={() => router.push('/settings')}
-              style={{
-                width: '100%',
-                padding: '16px 48px',
-                backgroundColor: '#2bd97c',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '18px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                marginBottom: '16px',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#24c471';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#2bd97c';
-              }}
-            >
-              Start your free 7-day trial
-            </button>
-            <p style={{
-              fontSize: '14px',
-              color: '#6b757b'
-            }}>
-              Cancel your trial at any time before it ends, and you won't be charged.
-            </p>
           </div>
         </div>
       </section>
@@ -1338,10 +1277,9 @@ export default function ChoosePlan() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq-section" style={{
+      <section style={{
         padding: '80px 40px',
-        backgroundColor: 'white',
-        position: 'relative'
+        backgroundColor: 'white'
       }}>
         <div style={{
           maxWidth: '1000px',
@@ -1815,47 +1753,56 @@ export default function ChoosePlan() {
       </footer>
 
       {/* Sticky Bottom CTA Button */}
-      {isSticky && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: 'white',
-          borderTop: '1px solid #e1e7ea',
-          padding: '16px 40px',
-          boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)',
-          zIndex: 1000,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
+      <div style={{
+        position: 'sticky',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderTop: '1px solid #e1e7ea',
+        padding: '16px 40px',
+        boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '-80px'
+      }}>
+        <button
+          onClick={() => router.push('/settings')}
+          style={{
+            width: '100%',
+            maxWidth: '500px',
+            padding: '16px 48px',
+            backgroundColor: '#2bd97c',
+            color: 'white',
+            border: 'none',
+            borderRadius: '40px',
+            fontSize: '18px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s',
+            marginBottom: '12px'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#24c471';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#2bd97c';
+          }}
+        >
+          Start your free 7-day trial
+        </button>
+        <p style={{
+          fontSize: '14px',
+          color: '#6b757b',
+          margin: 0,
+          textAlign: 'center'
         }}>
-          <button
-            onClick={() => router.push('/settings')}
-            style={{
-              width: '100%',
-              maxWidth: '500px',
-              padding: '16px 48px',
-              backgroundColor: '#2bd97c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '18px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#24c471';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#2bd97c';
-            }}
-          >
-            Start your free 7-day trial
-          </button>
-        </div>
-      )}
+          Cancel your trial at any time before it ends, and you won't be charged.
+        </p>
+      </div>
     </div>
   );
 }
