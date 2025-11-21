@@ -1,35 +1,68 @@
 'use client';
-
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { 
+  login, 
+  getIntendedDestination, 
+  clearIntendedDestination,
+  isSubscribed as checkIsSubscribed 
+} from '../utils/auth';
 
-export default function Login() {
-  const [showModal, setShowModal] = useState(true);
+interface LoginModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onLoginSuccess?: () => void;
+}
+
+export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const handleLoginFlow = () => {
+    login();
+    if (onLoginSuccess) onLoginSuccess();
+    
+    const intendedDestination = getIntendedDestination();
+    
+    if (intendedDestination) {
+      const subscribed = checkIsSubscribed();
+      
+      if (!subscribed) {
+        onClose();
+        router.push('/choose-plan');
+      } else {
+        clearIntendedDestination();
+        router.push(intendedDestination);
+        onClose();
+      }
+    } else {
+      onClose();
+    }
+  };
+
   const handleGuestLogin = () => {
     console.log('Guest login');
-   
+    handleLoginFlow();
   };
 
   const handleGoogleLogin = () => {
     console.log('Google login');
-  
+    handleLoginFlow();
   };
 
   const handleEmailLogin = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Email login:', email, password);
-   
+    handleLoginFlow();
   };
 
   const handleForgotPassword = () => {
     console.log('Forgot password');
-    
   };
 
-  if (!showModal) return null;
+  if (!isOpen) return null;
 
   return (
     <>
@@ -41,12 +74,14 @@ export default function Login() {
           right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           zIndex: 1000,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
         }}
-        onClick={() => setShowModal(false)}
+        onClick={onClose}
       >
         <div 
           style={{
@@ -61,7 +96,7 @@ export default function Login() {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => setShowModal(false)}
+            onClick={onClose}
             style={{
               position: 'absolute',
               top: '16px',
@@ -76,7 +111,6 @@ export default function Login() {
             ×
           </button>
 
-   
           <h2 style={{
             fontSize: '24px',
             fontWeight: 'bold',
@@ -87,7 +121,6 @@ export default function Login() {
             Log in to Summarist
           </h2>
 
-         
           <button
             onClick={handleGuestLogin}
             style={{
@@ -136,7 +169,6 @@ export default function Login() {
             }}></div>
           </div>
 
-      
           <button
             onClick={handleGoogleLogin}
             style={{
@@ -183,7 +215,6 @@ export default function Login() {
             }}></div>
           </div>
 
-         
           <form onSubmit={handleEmailLogin}>
             <input
               type="email"
@@ -198,7 +229,8 @@ export default function Login() {
                 padding: '0 16px',
                 fontSize: '16px',
                 marginBottom: '16px',
-                outline: 'none'
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
               required
             />
@@ -215,15 +247,23 @@ export default function Login() {
                 padding: '0 16px',
                 fontSize: '16px',
                 marginBottom: '16px',
-                outline: 'none'
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
               required
             />
             <button
               type="submit"
-              className="btn"
               style={{
                 width: '100%',
+                height: '48px',
+                backgroundColor: '#032b41',
+                color: 'white',
+                borderRadius: '4px',
+                fontSize: '16px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                border: 'none',
                 marginBottom: '16px'
               }}
             >
@@ -231,7 +271,6 @@ export default function Login() {
             </button>
           </form>
 
-   
           <div style={{ textAlign: 'center', marginBottom: '8px' }}>
             <button
               onClick={handleForgotPassword}
@@ -249,8 +288,14 @@ export default function Login() {
           </div>
 
           <div style={{ textAlign: 'center' }}>
+            <span style={{ fontSize: '14px', color: '#394547' }}>
+              Don&apos;t have an account?{' '}
+            </span>
             <button
-              onClick={() => window.location.href = '/register'}
+              onClick={() => {
+                onClose();
+                router.push('/register');
+              }}
               style={{
                 color: '#0365f2',
                 fontSize: '14px',
@@ -260,7 +305,7 @@ export default function Login() {
                 textDecoration: 'none'
               }}
             >
-              Don&apos;t have an account?
+              Sign up
             </button>
           </div>
         </div>

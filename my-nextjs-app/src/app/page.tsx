@@ -13,14 +13,12 @@ export default function Home() {
   const handleGuestLogin = () => {
     console.log('Guest login');
     setShowLoginModal(false);
-    // Navigate to for-you page
     router.push('/for-you');
   };
 
   const handleGoogleLogin = () => {
     console.log('Google login');
     setShowLoginModal(false);
-    // Navigate to for-you page
     router.push('/for-you');
   };
 
@@ -28,23 +26,19 @@ export default function Home() {
     e.preventDefault();
     console.log('Email login:', email, password);
     setShowLoginModal(false);
-    // Navigate to for-you page
     router.push('/for-you');
   };
 
   const handleForgotPassword = () => {
     console.log('Forgot password');
-    // Add your forgot password logic here
   };
 
 
 
   return (
     <>
-      {/* Login Modal */}
       {showLoginModal && (
         <>
-          {/* Backdrop */}
           <div 
             style={{
               position: 'fixed',
@@ -60,7 +54,6 @@ export default function Home() {
             }}
             onClick={() => setShowLoginModal(false)}
           >
-            {/* Modal */}
             <div 
               style={{
                 backgroundColor: 'white',
@@ -73,7 +66,6 @@ export default function Home() {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button */}
               <button
                 onClick={() => setShowLoginModal(false)}
                 style={{
@@ -90,7 +82,6 @@ export default function Home() {
                 ×
               </button>
 
-              {/* Title */}
               <h2 style={{
                 fontSize: '24px',
                 fontWeight: 'bold',
@@ -101,7 +92,6 @@ export default function Home() {
                 Log in to Summarist
               </h2>
 
-              {/* Guest Login Button */}
               <button
                 onClick={handleGuestLogin}
                 style={{
@@ -150,7 +140,6 @@ export default function Home() {
                 }}></div>
               </div>
 
-              {/* Google Login Button */}
               <button
                 onClick={handleGoogleLogin}
                 style={{
@@ -197,7 +186,6 @@ export default function Home() {
                 }}></div>
               </div>
 
-              {/* Email/Password Form */}
               <form onSubmit={handleEmailLogin}>
                 <input
                   type="email"
@@ -245,7 +233,6 @@ export default function Home() {
                 </button>
               </form>
 
-              {/* Forgot Password */}
               <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                 <button
                   onClick={handleForgotPassword}
@@ -262,7 +249,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Register Link */}
               <div style={{ textAlign: 'center' }}>
                 <span style={{ fontSize: '14px', color: '#394547' }}>
                   Don&apos;t have an account?{' '}
@@ -270,7 +256,6 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setShowLoginModal(false);
-                    // Navigate to register page or open register modal
                   }}
                   style={{
                     color: '#0365f2',
@@ -289,7 +274,6 @@ export default function Home() {
         </>
       )}
 
-      {/* Navigation */}
       <nav className="nav">
         <div className="nav__wrapper">
           <div className="nav__img--mask">
@@ -310,7 +294,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Landing Section */}
       <section id="landing">
         <div className="container">
           <div className="row">
@@ -339,7 +322,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features">
         <div className="container">
           <div className="row">
@@ -388,7 +370,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Statistics Section - First Row */}
       <section id="statistics">
         <div className="container">
           <div className="row">
@@ -428,7 +409,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Statistics Section - Second Row */}
       <section id="statistics">
         <div className="container">
           <div className="row">
@@ -468,7 +448,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Reviews Section */}
       <section id="reviews">
         <div className="container">
           <div className="row">
@@ -586,7 +565,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Numbers Section */}
       <section id="numbers">
         <div className="container">
           <div className="row">
@@ -647,7 +625,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer id="footer">
         <div className="container">
           <div className="row">

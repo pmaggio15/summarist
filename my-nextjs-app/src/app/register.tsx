@@ -11,19 +11,16 @@ export default function Register() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Register:', email, password);
-    // Add your registration logic here
   };
 
   const handleGoogleSignup = () => {
     console.log('Google signup');
-    // Add your Google signup logic here
   };
 
   if (!showModal) return null;
 
   return (
     <>
-      {/* Backdrop */}
       <div 
         style={{
           position: 'fixed',
@@ -39,7 +36,6 @@ export default function Register() {
         }}
         onClick={() => setShowModal(false)}
       >
-        {/* Modal */}
         <div 
           style={{
             backgroundColor: 'white',
@@ -52,7 +48,6 @@ export default function Register() {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close button */}
           <button
             onClick={() => setShowModal(false)}
             style={{
@@ -69,7 +64,6 @@ export default function Register() {
             ×
           </button>
 
-          {/* Title */}
           <h2 style={{
             fontSize: '24px',
             fontWeight: 'bold',
@@ -80,7 +74,6 @@ export default function Register() {
             Sign up to Summarist
           </h2>
 
-          {/* Google Signup Button */}
           <button
             onClick={handleGoogleSignup}
             style={{
@@ -127,7 +120,6 @@ export default function Register() {
             }}></div>
           </div>
 
-          {/* Email/Password Form */}
           <form onSubmit={handleRegister}>
             <input
               type="email"
@@ -175,7 +167,6 @@ export default function Register() {
             </button>
           </form>
 
-          {/* Login Link */}
           <div style={{ textAlign: 'center' }}>
             <button
               onClick={() => window.location.href = '/login'}
