@@ -22,7 +22,7 @@ export default function ForYou() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Add these state variables
+
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
   const [suggestedBooks, setSuggestedBooks] = useState<Book[]>([]);
@@ -30,21 +30,18 @@ export default function ForYou() {
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
-  // Add this useEffect to fetch data
+
   useEffect(() => {
-    // Fetch selected book
     fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected')
       .then(res => res.json())
       .then(data => setSelectedBook(data[0]))
       .catch(error => console.error('Error:', error));
 
-    // Fetch recommended books
     fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended')
       .then(res => res.json())
       .then(data => setRecommendedBooks(data))
       .catch(error => console.error('Error:', error));
 
-    // Fetch suggested books
     fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested')
       .then(res => res.json())
       .then(data => {
@@ -54,10 +51,9 @@ export default function ForYou() {
       .catch(error => console.error('Error:', error));
   }, []);
 
-  // Search functionality
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
-      // Fetch all books and combine them
+      
       Promise.all([
         fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected').then(res => res.json()),
         fetch('https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended').then(res => res.json()),
@@ -69,7 +65,7 @@ export default function ForYou() {
             book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             book.author.toLowerCase().includes(searchQuery.toLowerCase())
           );
-          // Remove duplicates based on book id
+          
           const uniqueBooks = filtered.filter((book, index, self) =>
             index === self.findIndex((b) => b.id === book.id)
           );
@@ -101,7 +97,7 @@ export default function ForYou() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Sidebar */}
+      
       <aside style={{
         width: '200px',
         backgroundColor: '#f7faf9',
@@ -112,7 +108,7 @@ export default function ForYou() {
         left: 0,
         top: 0
       }}>
-        {/* Logo */}
+        
         <div style={{ padding: '0 24px', marginBottom: '40px' }}>
           <Image 
             src="/logo.png" 
@@ -123,7 +119,6 @@ export default function ForYou() {
           />
         </div>
 
-        {/* Navigation */}
         <nav>
           <div style={{
             padding: '12px 24px',
@@ -195,7 +190,6 @@ export default function ForYou() {
           </div>
         </nav>
 
-        {/* Bottom Navigation */}
         <div style={{ position: 'absolute', bottom: '24px', width: '100%' }}>
           <div style={{
             padding: '12px 24px',
@@ -245,13 +239,11 @@ export default function ForYou() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main style={{
         marginLeft: '200px',
         flex: 1,
         backgroundColor: 'white'
       }}>
-        {/* Search Bar */}
           <div style={{
             padding: '24px 40px',
             borderBottom: '1px solid #e1e7ea',
@@ -278,7 +270,6 @@ export default function ForYou() {
               />
               {searchQuery ? (
                 <>
-                  {/* Vertical divider line - full height */}
                   <div style={{
                     position: 'absolute',
                     right: '38px',
@@ -288,7 +279,6 @@ export default function ForYou() {
                     backgroundColor: '#e1e7ea'
                   }}></div>
                   
-                  {/* X icon when there's text */}
                   <svg 
                     onMouseDown={(e) => {
                       e.preventDefault();
@@ -323,7 +313,6 @@ export default function ForYou() {
                 </>
               ) : (
                 <>
-                  {/* Vertical divider line - full height */}
                   <div style={{
                     position: 'absolute',
                     right: '38px',
@@ -333,7 +322,6 @@ export default function ForYou() {
                     backgroundColor: '#e1e7ea'
                   }}></div>
                   
-                  {/* Search icon when empty */}
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     width="18" 
@@ -356,7 +344,6 @@ export default function ForYou() {
                 </>
               )}
 
-              {/* Search Dropdown */}
               {showSearchDropdown && searchResults.length > 0 && (
                 <div style={{
                   position: 'absolute',
@@ -436,7 +423,6 @@ export default function ForYou() {
                 </div>
               )}
 
-              {/* Close search when clicking outside */}
               {showSearchDropdown && (
                 <div
                   style={{
@@ -453,9 +439,7 @@ export default function ForYou() {
             </div>
           </div>
 
-        {/* Content */}
         <div style={{ padding: '40px', maxWidth: '1100px' }}>
-          {/* Selected Just For You Section */}
           <section style={{ marginBottom: '60px' }}>
             <h2 style={{
               fontSize: '32px',
@@ -543,7 +527,6 @@ export default function ForYou() {
             )}
           </section>
 
-          {/* Recommended For You Section */}
           <section style={{ marginBottom: '60px' }}>
             <h2 style={{
               fontSize: '28px',
@@ -640,7 +623,6 @@ export default function ForYou() {
             </div>
           </section>
 
-          {/* Suggested Books Section */}
           <section>
             <h2 style={{
               fontSize: '28px',
